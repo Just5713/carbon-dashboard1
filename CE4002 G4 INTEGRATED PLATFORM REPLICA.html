@@ -1,0 +1,534 @@
+
+<h2 class="sr-only">NUS Integrated Carbon Intelligence Platform — interactive dashboard with five tabs: Overview, Enhancement, Impact Simulator, Road Map, and Data Audit.</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+body{font-family:var(--font-sans)}
+.shell{display:flex;height:auto;min-height:700px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary)}
+.sidebar{width:180px;flex-shrink:0;background:#0D2B1E;display:flex;flex-direction:column}
+.sb-brand{padding:18px 16px 12px}
+.sb-logo{width:28px;height:28px;background:#1A5C3A;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.sb-logo svg{width:16px;height:16px;fill:#A8D5B5}
+.sb-title{color:#fff;font-size:12px;font-weight:500;line-height:1.4}
+.sb-sub{color:#6aaa80;font-size:10px;margin-top:2px}
+.sb-divider{height:0.5px;background:#1A5C3A;margin:4px 0}
+.sb-nav{flex:1;padding:8px 0}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;transition:background .15s;color:#A8D5B5;font-size:12px;border-left:2px solid transparent}
+.sb-item:hover{background:#1A5C3A80;color:#fff}
+.sb-item.active{background:#1A5C3A;color:#fff;border-left-color:#F4A300}
+.sb-item svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb-footer{padding:12px 16px;border-top:0.5px solid #1A5C3A}
+.sb-user{color:#6aaa80;font-size:10px}
+.sb-username{color:#A8D5B5;font-size:11px;font-weight:500}
+.main{flex:1;overflow-y:auto;padding:20px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.page-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.page-sub{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.btn-primary{font-size:12px;padding:7px 14px;border-radius:var(--border-radius-md);background:#0D2B1E;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-outline{font-size:12px;padding:7px 14px;border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-outline:hover{background:var(--color-background-secondary)}
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.kpi3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpi2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kpi-label{font-size:11px;color:var(--color-text-tertiary);font-weight:500;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.kpi-value{font-size:20px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.kpi-sub{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.kpi-delta{font-size:11px;margin-top:3px;font-weight:500}
+.delta-g{color:#1A5C3A}.delta-r{color:#C0392B}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.grid-equal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.card-sub{font-size:11px;color:var(--color-text-tertiary);font-weight:400;margin-left:6px}
+.chart-wrap{position:relative;width:100%}
+.legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.status-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.status-row:last-child{border-bottom:none}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-label{font-size:12px;color:var(--color-text-primary);font-weight:500;flex:1}
+.status-sub{font-size:11px;color:var(--color-text-secondary)}
+.status-val{font-size:12px;font-weight:500;text-align:right}
+.badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+.badge-g{background:#EAF3DE;color:#3B6D11}
+.badge-a{background:#FAEEDA;color:#854F0B}
+.badge-r{background:#FCEBEB;color:#A32D2D}
+.badge-b{background:#E6F1FB;color:#185FA5}
+.badge-dark{background:#0D2B1E;color:#A8D5B5}
+.progress-wrap{margin:6px 0}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.progress-bg{height:7px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden}
+.progress-bar{height:7px;border-radius:4px}
+.alert-box{border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px;font-size:12px;display:flex;align-items:flex-start;gap:8px}
+.alert-g{background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459}
+.alert-a{background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27}
+.alert-r{background:#FCEBEB;color:#A32D2D;border:0.5px solid #F09595}
+.alert-b{background:#E6F1FB;color:#185FA5;border:0.5px solid #85B7EB}
+.alert-icon{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;margin-top:1px}
+.enh-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.enh-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.enh-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;flex-shrink:0}
+.enh-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.enh-sub{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.metric-row{display:flex;gap:8px;margin-bottom:8px}
+.metric-mini{flex:1;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center}
+.mm-val{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.mm-lbl{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.sim-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sim-label{font-size:12px;color:var(--color-text-secondary);width:150px;flex-shrink:0}
+.sim-val{font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:44px;text-align:right}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.result-item{background:#0D2B1E;border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.result-val{font-size:17px;font-weight:500;color:#F4A300}
+.result-lbl{font-size:10px;color:#A8D5B5;margin-top:2px}
+.tl-wrap{padding:0 2px}
+.tl-item{display:flex;gap:12px;margin-bottom:14px}
+.tl-left{display:flex;flex-direction:column;align-items:center}
+.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tl-line{width:2px;flex:1;background:var(--color-border-tertiary);margin:3px 4px}
+.tl-content{flex:1;padding-bottom:4px}
+.tl-period{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.tl-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.tl-body{font-size:11px;color:var(--color-text-secondary);line-height:1.6}
+.corr-row{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);align-items:flex-start}
+.corr-row:last-child{border-bottom:none}
+.corr-num{width:22px;height:22px;border-radius:50%;background:#FCEBEB;color:#A32D2D;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.corr-content{flex:1}
+.corr-item{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.corr-was{font-size:11px;color:#A32D2D;text-decoration:line-through}
+.corr-now{font-size:11px;color:#1A5C3A;font-weight:500}
+.corr-note{font-size:10px;color:var(--color-text-tertiary);font-style:italic;margin-top:1px}
+.verified-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.verified-row:last-child{border-bottom:none}
+.vcheck{width:16px;height:16px;background:#EAF3DE;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vcheck svg{width:10px;height:10px}
+.vtext{font-size:12px;color:var(--color-text-primary)}
+.scope-ring{position:relative;display:flex;align-items:center;justify-content:center}
+input[type=range]{width:100%}
+.roadmap-phase{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:0;overflow:hidden;margin-bottom:10px}
+.phase-header{padding:12px 14px;display:flex;align-items:center;gap:8px}
+.phase-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#fff;flex-shrink:0}
+.phase-info{flex:1}
+.phase-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.phase-period{font-size:11px;color:var(--color-text-secondary)}
+.phase-body{padding:0 14px 12px;border-top:0.5px solid var(--color-border-tertiary)}
+.phase-item{font-size:12px;color:var(--color-text-secondary);padding:5px 0 5px 12px;border-left:2px solid var(--color-border-tertiary);margin-top:6px;line-height:1.5}
+</style>
+
+<div class="shell">
+  <nav class="sidebar" aria-label="Dashboard navigation">
+    <div class="sb-brand">
+      <div class="sb-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.74 0 3.37-.45 4.8-1.23C19.96 19.07 22 15.77 22 12 22 6.48 17.52 2 12 2zm-1 15.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      </div>
+      <div class="sb-title">Integrated Carbon Intelligence Platform</div>
+      <div class="sb-sub">NUS Sustainability · FY2024</div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-nav">
+      <div class="sb-item active" onclick="switchTab('overview',this)" role="button" tabindex="0" aria-current="page">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="sb-item" onclick="switchTab('enhancement',this)" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Enhancement
+      </div>
+      <div class="sb-item" onclick="switchTab('simulator',this)" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Impact Simulator
+      </div>
+      <div class="sb-item" onclick="switchTab('roadmap',this)" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        Road Map
+      </div>
+      <div class="sb-item" onclick="switchTab('audit',this)" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Data Audit
+      </div>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-username">Group 4 · UCI</div>
+      <div class="sb-user">April 2026</div>
+    </div>
+  </nav>
+
+  <main class="main" id="mainContent">
+
+    <div id="tab-overview" class="tab-panel active">
+      <div class="page-header">
+        <div><div class="page-title">Overview</div><div class="page-sub">FY2024 baseline · Live carbon intelligence · 2030 target tracking</div></div>
+        <button class="btn-primary" onclick="sendPrompt('Summarise the NUS FY2024 carbon overview and what the 2030 target gap means')">Export report ↗</button>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total GHG (FY2024)</div><div class="kpi-value">329 ktCO₂e</div><div class="kpi-sub">Scope 1 + 2 + 3</div></div>
+        <div class="kpi"><div class="kpi-label">Scope 1 + 2</div><div class="kpi-value">118 ktCO₂e</div><div class="kpi-delta delta-r">39 ktCO₂e gap to 2030</div></div>
+        <div class="kpi"><div class="kpi-label">Scope 3</div><div class="kpi-value">211 ktCO₂e</div><div class="kpi-sub">64% of total footprint</div></div>
+        <div class="kpi"><div class="kpi-label">Grid electricity</div><div class="kpi-value">276 GWh</div><div class="kpi-sub">0.412 kgCO₂/kWh EMA EF</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Emissions by scope <span class="card-sub">— FY2024 breakdown</span></div>
+          <div class="legend-row">
+            <div class="leg"><div class="leg-sq" style="background:#0D2B1E"></div>Scope 1 — 0.8%</div>
+            <div class="leg"><div class="leg-sq" style="background:#1A5C3A"></div>Scope 2 — 35%</div>
+            <div class="leg"><div class="leg-sq" style="background:#F4A300"></div>Scope 3 — 64%</div>
+          </div>
+          <div class="chart-wrap" style="height:180px"><canvas id="c_scope" role="img" aria-label="Donut chart: Scope 1 0.8%, Scope 2 35%, Scope 3 64% of 329 ktCO2e total">Scope 1: 2.7, Scope 2: 115, Scope 3: 211 ktCO2e.</canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">2030 target progress</div>
+          <div style="text-align:center;padding:10px 0">
+            <div style="font-size:36px;font-weight:500;color:#1A5C3A">68%</div>
+            <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">progress toward 79 ktCO₂e target</div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>2019 baseline (113)</span><span>Current (118)</span></div>
+            <div class="progress-bg"><div class="progress-bar" style="width:100%;background:#C0392B"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:8px">
+            <div class="progress-label"><span>With proposals (113.6)</span><span>Target (79)</span></div>
+            <div class="progress-bg"><div class="progress-bar" style="width:56%;background:#1A5C3A"></div></div>
+          </div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:8px;font-style:italic">Proposals address 8.4% of remaining S1+2 gap. Remaining gap requires chiller retrofits, LED, expanded solar PV.</div>
+        </div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Building EUI highlights</div>
+          <div class="status-row"><div class="status-dot" style="background:#1A5C3A"></div><div><div class="status-label">SDE4 — best in class</div><div class="status-sub">Positive energy building</div></div><div class="status-val" style="color:#1A5C3A">43 kWh/m²</div></div>
+          <div class="status-row"><div class="status-dot" style="background:#1A5C3A"></div><div><div class="status-label">YIH — net-zero target</div><div class="status-sub">Post-retrofit goal</div></div><div class="status-val" style="color:#1A5C3A">47 kWh/m²</div></div>
+          <div class="status-row"><div class="status-dot" style="background:#B4B2A9"></div><div><div class="status-label">Campus average</div><div class="status-sub">Improvement target</div></div><div class="status-val">193 kWh/m²</div></div>
+          <div class="status-row"><div class="status-dot" style="background:#F4A300"></div><div><div class="status-label">MD6 — laboratory</div><div class="status-sub">AI pilot active</div></div><div class="status-val" style="color:#854F0B">434 kWh/m²</div></div>
+          <div class="status-row"><div class="status-dot" style="background:#C0392B"></div><div><div class="status-label">S9 — highest EUI</div><div class="status-sub">Priority intervention</div></div><div class="status-val" style="color:#C0392B">538 kWh/m²</div></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Solar PV status</div>
+          <div style="text-align:center;padding:8px 0 4px">
+            <div style="font-size:28px;font-weight:500;color:#1A5C3A">9.2 MWp</div>
+            <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">commissioned capacity (2024)</div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Solar generation</span><span>3.9% of total</span></div>
+            <div class="progress-bg"><div class="progress-bar" style="width:3.9%;background:#F4A300"></div></div>
+          </div>
+          <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">Generates 11 GWh/yr. Remaining 96.1% of 283 GWh demand sourced from national grid. Significant expansion needed to meet 2030 target independently.</div>
+          <div class="alert-box alert-a" style="margin-top:10px;margin-bottom:0">
+            <svg class="alert-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Grid dependency remains at 96% — the primary decarbonisation lever.
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Smart-Cool live alerts</div>
+          <div class="alert-box alert-r"><svg class="alert-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Overcooling detected: LT27 — setpoint +1.5°C recommended</div>
+          <div class="alert-box alert-a"><svg class="alert-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>MD6 ACMV running off-hours — occupancy 0%, cooling at 85%</div>
+          <div class="alert-box alert-g"><svg class="alert-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>ACMV load reduced 20% this week vs baseline</div>
+          <div class="alert-box alert-b"><svg class="alert-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Scope 3 Vendor A: Green Score issued — 12.4 tCO₂e below industry avg</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Scope 3 category breakdown <span class="card-sub">— ktCO₂e FY2024</span></div>
+        <div class="legend-row"><div class="leg"><div class="leg-sq" style="background:#0D2B1E"></div>Capital Goods</div><div class="leg"><div class="leg-sq" style="background:#1A5C3A"></div>Purchased Goods</div><div class="leg"><div class="leg-sq" style="background:#2E8B57"></div>Business Travel</div><div class="leg"><div class="leg-sq" style="background:#A8D5B5"></div>Commuting</div><div class="leg"><div class="leg-sq" style="background:#D3D1C7"></div>Other</div></div>
+        <div class="chart-wrap" style="height:160px"><canvas id="c_s3" role="img" aria-label="Bar chart of Scope 3 categories in ktCO2e: Capital Goods 63.2, Purchased Goods 39.3, Business Travel 34, Employee Commute 18, Other 56.5">Capital Goods: 63.2, Purchased: 39.3, Travel: 34, Commute: 18, Other: 56.5 ktCO2e.</canvas></div>
+      </div>
+    </div>
+
+    <div id="tab-enhancement" class="tab-panel">
+      <div class="page-header">
+        <div><div class="page-title">Enhancements</div><div class="page-sub">Three strategic proposals · SGD 5.0M investment · 9,894 tCO₂e/yr combined</div></div>
+        <div style="display:flex;gap:6px">
+          <div class="badge badge-dark">FY2024 data</div>
+          <div class="badge badge-g">All verified</div>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Combined CO₂ abated</div><div class="kpi-value">9,894 tCO₂e</div><div class="kpi-sub">per year</div></div>
+        <div class="kpi"><div class="kpi-label">Annual savings</div><div class="kpi-value">SGD 3.99M</div><div class="kpi-delta delta-g">net utility cost reduction</div></div>
+        <div class="kpi"><div class="kpi-label">10-year NPV</div><div class="kpi-value">SGD 29.4M</div><div class="kpi-sub">on SGD 5.0M outlay</div></div>
+        <div class="kpi"><div class="kpi-label">S1+2 gap addressed</div><div class="kpi-value">8.4%</div><div class="kpi-sub">of 39 ktCO₂e remaining</div></div>
+      </div>
+      <div class="enh-card">
+        <div class="enh-header"><div class="enh-num" style="background:#1A5C3A">1</div><div><div class="enh-title">Digital Carbon Accounting Platform (DCAP)</div><div class="enh-sub">Real-time carbon intelligence · Closes the Carbon Intelligence Gap</div></div><div style="margin-left:auto"><span class="badge badge-g">Quick win</span></div></div>
+        <div class="metric-row">
+          <div class="metric-mini"><div class="mm-val" style="color:#1A5C3A">3,411</div><div class="mm-lbl">tCO₂e/yr</div></div>
+          <div class="metric-mini"><div class="mm-val">SGD 2.48M</div><div class="mm-lbl">annual savings</div></div>
+          <div class="metric-mini"><div class="mm-val">0.42 yrs</div><div class="mm-lbl">payback</div></div>
+          <div class="metric-mini"><div class="mm-val">248%</div><div class="mm-lbl">ROI</div></div>
+          <div class="metric-mini"><div class="mm-val">SGD 22.8M</div><div class="mm-lbl">10-yr NPV</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:8px">Integrates BMS, IoT sub-meters, shuttle telematics and procurement databases into a centralised cloud platform. Automates GHG Protocol conversion at building/floor/system level. Anomaly detection flags overcooling and off-hours ACMV use. Reduces GRI reporting admin by 70%.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge badge-b">BMS integration</span><span class="badge badge-b">IoT sub-metering</span><span class="badge badge-b">GHG Protocol auto-calc</span><span class="badge badge-b">Anomaly detection</span><span class="badge badge-b">ISSB/TCFD ready</span></div>
+      </div>
+      <div class="enh-card">
+        <div class="enh-header"><div class="enh-num" style="background:#0D7377">2</div><div><div class="enh-title">Scope 3 Supply Chain Engagement Programme</div><div class="enh-sub">Supplier-specific carbon accounting · Closes the Scope 3 Accountability Gap</div></div><div style="margin-left:auto"><span class="badge badge-a">Strategic</span></div></div>
+        <div class="metric-row">
+          <div class="metric-mini"><div class="mm-val" style="color:#0D7377">5,000</div><div class="mm-lbl">tCO₂e/yr</div></div>
+          <div class="metric-mini"><div class="mm-val">SGD 0.43M</div><div class="mm-lbl">annual savings</div></div>
+          <div class="metric-mini"><div class="mm-val">5.4 yrs</div><div class="mm-lbl">payback</div></div>
+          <div class="metric-mini"><div class="mm-val">29%</div><div class="mm-lbl">ROI</div></div>
+          <div class="metric-mini"><div class="mm-val">SGD 1.3M</div><div class="mm-lbl">10-yr NPV</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:8px">Three phases: mandatory carbon disclosure in tenders >SGD 100k → enforceable carbon intensity thresholds → Green Vendor Award. Targets Cat 1+2 (102 ktCO₂e). Ripple effect across Singapore SME supply chain. Aligns with GRI 305 and GHG Protocol Scope 3.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge badge-b">Phase 1: Disclosure</span><span class="badge badge-b">Phase 2: Standards</span><span class="badge badge-b">Green Vendor Award</span><span class="badge badge-b">SGP 2030 aligned</span></div>
+        <div class="card" style="margin-top:10px;margin-bottom:0;padding:10px 12px">
+          <div class="card-title" style="font-size:12px;margin-bottom:8px">Scope 3 vendor performance tracker</div>
+          <div class="status-row"><div class="status-dot" style="background:#1A5C3A"></div><div style="flex:1"><div class="status-label">Vendor A — Greentech Supplies</div><div class="status-sub">Disclosed: 8.4 tCO₂e/SGD 100k spend</div></div><span class="badge badge-g">Green score</span></div>
+          <div class="status-row"><div class="status-dot" style="background:#F4A300"></div><div style="flex:1"><div class="status-label">Vendor B — Build Corp Pte Ltd</div><div class="status-sub">Disclosed: 14.7 tCO₂e/SGD 100k spend</div></div><span class="badge badge-a">Moderate</span></div>
+          <div class="status-row"><div class="status-dot" style="background:#C0392B"></div><div style="flex:1"><div class="status-label">Vendor C — Legacy Materials Co.</div><div class="status-sub">No disclosure submitted — penalty flagged</div></div><span class="badge badge-r">High carbon</span></div>
+        </div>
+      </div>
+      <div class="enh-card">
+        <div class="enh-header"><div class="enh-num" style="background:#0D2B1E">3</div><div><div class="enh-title">AI Smart-Cool Energy Optimisation (Project Smart-Cool)</div><div class="enh-sub">Dynamic ACMV control · Closes the ACMV Energy Waste Gap</div></div><div style="margin-left:auto"><span class="badge badge-dark">AI-powered</span></div></div>
+        <div class="metric-row">
+          <div class="metric-mini"><div class="mm-val" style="color:#0D2B1E">1,483</div><div class="mm-lbl">tCO₂e/yr</div></div>
+          <div class="metric-mini"><div class="mm-val">SGD 1.08M</div><div class="mm-lbl">annual savings</div></div>
+          <div class="metric-mini"><div class="mm-val">3.2 yrs</div><div class="mm-lbl">payback</div></div>
+          <div class="metric-mini"><div class="mm-val">43%</div><div class="mm-lbl">ROI</div></div>
+          <div class="metric-mini"><div class="mm-val">SGD 5.3M</div><div class="mm-lbl">10-yr NPV</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:8px">ML model trained on NUSMods schedules, NEA weather, occupancy sensors and BMS telemetry. Dynamically adjusts chilled water temperatures and cooling set-points zone by zone. MD6 pilot: 8.5% saving FY2024, projected 20% by 2026. 83.5 GWh ACMV in scope.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge badge-b">NEA weather API</span><span class="badge badge-b">NUSMods integration</span><span class="badge badge-b">Occupancy sensors</span><span class="badge badge-b">MD6 pilot active</span><span class="badge badge-b">Lecture theatre pilot</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Enhancement comparison <span class="card-sub">— CO₂ abated vs 10-yr NPV</span></div>
+        <div class="legend-row"><div class="leg"><div class="leg-sq" style="background:#1A5C3A"></div>DCAP</div><div class="leg"><div class="leg-sq" style="background:#0D7377"></div>Scope 3</div><div class="leg"><div class="leg-sq" style="background:#0D2B1E"></div>Smart-Cool</div></div>
+        <div class="chart-wrap" style="height:160px"><canvas id="c_enh" role="img" aria-label="Grouped bar chart comparing CO2 abatement and 10-year NPV for three enhancements">DCAP: 3411 tCO2e/yr, NPV 22.8M. Scope 3: 5000 tCO2e/yr, NPV 1.3M. Smart-Cool: 1483 tCO2e/yr, NPV 5.3M.</canvas></div>
+      </div>
+    </div>
+
+    <div id="tab-simulator" class="tab-panel">
+      <div class="page-header">
+        <div><div class="page-title">Impact Simulator</div><div class="page-sub">Adjust assumptions to explore scenario outcomes · All based on FY2024 NUS data</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Scenario controls</div>
+        <div class="sim-row"><div class="sim-label">DCAP efficiency gain</div><input type="range" min="1" max="8" step="1" value="3" id="sl1" oninput="updateSim()"><div class="sim-val" id="sv1">3%</div></div>
+        <div class="sim-row"><div class="sim-label">Smart-Cool reduction rate</div><input type="range" min="5" max="20" step="1" value="15" id="sl2" oninput="updateSim()"><div class="sim-val" id="sv2">15%</div></div>
+        <div class="sim-row"><div class="sim-label">Electricity tariff (SGD/kWh)</div><input type="range" min="20" max="50" step="1" value="30" id="sl3" oninput="updateSim()"><div class="sim-val" id="sv3">0.30</div></div>
+        <div class="sim-row"><div class="sim-label">Scope 3 intensity reduction</div><input type="range" min="5" max="20" step="1" value="10" id="sl4" oninput="updateSim()"><div class="sim-val" id="sv4">10%</div></div>
+        <div class="sim-row"><div class="sim-label">Shadow carbon price (SGD/t)</div><input type="range" min="0" max="200" step="10" value="100" id="sl5" oninput="updateSim()"><div class="sim-val" id="sv5">100</div></div>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-val" id="res1">9,894</div><div class="result-lbl">tCO₂e/yr abated</div></div>
+          <div class="result-item"><div class="result-val" id="res2">SGD 3.99M</div><div class="result-lbl">annual savings</div></div>
+          <div class="result-item"><div class="result-val" id="res3">SGD 29.4M</div><div class="result-lbl">10-yr NPV</div></div>
+        </div>
+      </div>
+      <div class="grid-equal">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Simulated annual abatement <span class="card-sub">— tCO₂e/yr</span></div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c_sim" role="img" aria-label="Bar chart showing simulated CO2 abatement by enhancement, updating with slider inputs">Simulated abatement per enhancement.</canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">S1+2 target gap progress</div>
+          <div style="margin-top:8px">
+            <div class="progress-wrap"><div class="progress-label"><span>FY2024 baseline</span><span>118 ktCO₂e</span></div><div class="progress-bg"><div class="progress-bar" style="width:100%;background:#C0392B"></div></div></div>
+            <div class="progress-wrap" style="margin-top:8px"><div class="progress-label"><span style="color:#1A5C3A;font-weight:500">After proposals</span><span id="prog-after-val">~113.6</span></div><div class="progress-bg"><div id="prog-bar" class="progress-bar" style="width:89%;background:#1A5C3A"></div></div></div>
+            <div class="progress-wrap" style="margin-top:8px"><div class="progress-label"><span>2030 target</span><span>79 ktCO₂e</span></div><div class="progress-bg"><div class="progress-bar" style="width:67%;background:#0D2B1E"></div></div></div>
+          </div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:10px;font-style:italic" id="prog-note">Proposals address 8.4% of the 39 ktCO₂e S1+2 gap. Additional measures needed to fully reach target.</div>
+          <div class="alert-box alert-b" style="margin-top:10px;margin-bottom:0"><svg class="alert-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Shadow carbon value at SGD 100/t: SGD <span id="shadow-val">0.99</span>M/yr additional benefit</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-title">Cumulative net return by project <span class="card-sub">— 10-year horizon</span></div>
+        <div class="legend-row"><div class="leg"><div class="leg-sq" style="background:#1A5C3A"></div>DCAP</div><div class="leg"><div class="leg-sq" style="background:#0D7377;border:1px dashed #0D7377"></div>Smart-Cool</div><div class="leg"><div class="leg-sq" style="background:#F4A300;border:1px dotted #F4A300"></div>Scope 3</div></div>
+        <div class="chart-wrap" style="height:180px"><canvas id="c_cum" role="img" aria-label="Line chart showing cumulative net return over 10 years for DCAP, Smart-Cool, and Scope 3 programme">DCAP reaches SGD 26M by year 10. Smart-Cool and Scope 3 reach approximately SGD 5M each.</canvas></div>
+      </div>
+    </div>
+
+    <div id="tab-roadmap" class="tab-panel">
+      <div class="page-header">
+        <div><div class="page-title">Road Map</div><div class="page-sub">Three-phase deployment · 2026–2031 · Toward Carbon Digital Twin</div></div>
+        <span class="badge badge-g" style="font-size:12px;padding:6px 12px">Phase 1 — Active 2026</span>
+      </div>
+      <div class="kpi-row kpi3">
+        <div class="kpi"><div class="kpi-label">Phase 1 — Foundation</div><div class="kpi-value" style="font-size:15px">Year 1 (2026–27)</div><div class="kpi-sub">DCAP pilot · Tender reform</div></div>
+        <div class="kpi"><div class="kpi-label">Phase 2 — Scale</div><div class="kpi-value" style="font-size:15px">Years 2–3 (2027–29)</div><div class="kpi-sub">Full DCAP · AI rollout</div></div>
+        <div class="kpi"><div class="kpi-label">Phase 3 — Ecosystem</div><div class="kpi-value" style="font-size:15px">Years 3–5 (2029–31)</div><div class="kpi-sub">Carbon Digital Twin</div></div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-header"><div class="phase-num" style="background:#1A5C3A">1</div><div class="phase-info"><div class="phase-title">Foundation — Year 1 (2026–2027)</div><div class="phase-period">Immediate deployment · Low barrier to entry</div></div><span class="badge badge-g">Active</span></div>
+        <div class="phase-body">
+          <div class="phase-item">Deploy DCAP pilot across top-5 energy buildings: S9, MD6, MD1, T-Lab, E3A — collectively 74+ GWh/yr</div>
+          <div class="phase-item">Update all procurement tender templates >SGD 100k with mandatory carbon disclosure clauses (Phase 1 of Scope 3 programme)</div>
+          <div class="phase-item">Formalise lecture theatre and MD6 AI Smart-Cool pilots. Sensor network expansion begins</div>
+          <div class="phase-item">Establish real-time EUI dashboard for facilities managers and Energy Management Working Group</div>
+          <div class="phase-item">Expected savings Year 1: SGD 2.48M (DCAP utility) + early Smart-Cool pilot yields</div>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-header"><div class="phase-num" style="background:#2E8B57">2</div><div class="phase-info"><div class="phase-title">Scale &amp; Integrate — Years 2–3 (2027–2029)</div><div class="phase-period">Campus-wide deployment · First vendor audit</div></div><span class="badge badge-a">Upcoming</span></div>
+        <div class="phase-body">
+          <div class="phase-item">Extend DCAP to all 80+ major campus buildings with full BMS integration</div>
+          <div class="phase-item">Roll out AI Smart-Cool to top-20 energy-consuming buildings, building on active pilots</div>
+          <div class="phase-item">Commence first Scope 3 vendor audit cycle. Issue inaugural Green Vendor Awards</div>
+          <div class="phase-item">Begin collection of supplier-primary emissions data (transition from spend-based estimation)</div>
+          <div class="phase-item">Expected cumulative savings by Year 3: SGD ~6–8M</div>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-header"><div class="phase-num" style="background:#0D2B1E">3</div><div class="phase-info"><div class="phase-title">Full Ecosystem Maturity — Years 3–5 (2029–2031)</div><div class="phase-period">Carbon Digital Twin · 2030 final push</div></div><span class="badge badge-b">Planned</span></div>
+        <div class="phase-body">
+          <div class="phase-item">Achieve Carbon Digital Twin: unified Scope 1, 2 and 3 real-time model — emissions as auditable as financial accounts</div>
+          <div class="phase-item">Report Scope 3 key categories at same precision and auditability as Scope 1+2</div>
+          <div class="phase-item">Full 83.5 GWh ACMV in scope for Smart-Cool — mature phase projecting 6–8 GWh savings</div>
+          <div class="phase-item">Final push toward 79 ktCO₂e Scope 1+2 target via absolute reductions + high-quality carbon removals where necessary</div>
+          <div class="phase-item">10-year portfolio NPV: SGD 29.4M on SGD 5.0M capital outlay</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Investment vs cumulative savings <span class="card-sub">— SGD M over 10 years</span></div>
+        <div class="legend-row"><div class="leg"><div class="leg-sq" style="background:#C0392B"></div>Cumulative investment (SGD 5M flat)</div><div class="leg"><div class="leg-sq" style="background:#1A5C3A;border:1px dashed #1A5C3A"></div>Cumulative savings</div></div>
+        <div class="chart-wrap" style="height:160px"><canvas id="c_invest" role="img" aria-label="Line chart showing cumulative investment flat at SGD 5M and cumulative savings growing to over SGD 34M by year 10">Investment flat at 5M. Savings cross break-even in Year 3 and reach ~34M by Year 10.</canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title">Key dependencies and risks</div>
+        <div class="status-row"><div class="status-dot" style="background:#1A5C3A"></div><div style="flex:1"><div class="status-label">BMS infrastructure partially in place</div><div class="status-sub">Reduces DCAP deployment cost and timeline significantly</div></div><span class="badge badge-g">Low risk</span></div>
+        <div class="status-row"><div class="status-dot" style="background:#F4A300"></div><div style="flex:1"><div class="status-label">Vendor participation in Scope 3 programme</div><div class="status-sub">SME readiness for carbon disclosure varies — onboarding support needed</div></div><span class="badge badge-a">Medium risk</span></div>
+        <div class="status-row"><div class="status-dot" style="background:#F4A300"></div><div style="flex:1"><div class="status-label">AI model accuracy at full campus scale</div><div class="status-sub">MD6 pilot evidence strong — broader rollout needs retraining budget</div></div><span class="badge badge-a">Medium risk</span></div>
+        <div class="status-row"><div class="status-dot" style="background:#1A5C3A"></div><div style="flex:1"><div class="status-label">EMA grid emission factor updates</div><div class="status-sub">DCAP auto-updates annually — no manual recalculation needed</div></div><span class="badge badge-g">Managed</span></div>
+      </div>
+    </div>
+
+    <div id="tab-audit" class="tab-panel">
+      <div class="page-header">
+        <div><div class="page-title">Data Audit</div><div class="page-sub">Numerical verification · 6 corrections identified and applied · Full transparency</div></div>
+        <div class="badge badge-g" style="font-size:12px;padding:6px 12px">All calculations verified</div>
+      </div>
+      <div class="alert-box alert-a" style="margin-bottom:14px">
+        <svg class="alert-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>6 errors identified in the written proposal during independent numerical verification. All corrected before this presentation. Proactive transparency is a mark of engineering rigour.</div>
+      </div>
+      <div class="grid-equal">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Corrections applied</div>
+          <div class="corr-row"><div class="corr-num">1</div><div class="corr-content"><div class="corr-item">Exec Summary — total CO₂ abatement</div><div class="corr-was">Was: 9,455 tCO₂e/yr</div><div class="corr-now">Now: 9,894 tCO₂e/yr (3,411 + 5,000 + 1,483)</div><div class="corr-note">Simple addition error — table was correct</div></div></div>
+          <div class="corr-row"><div class="corr-num">2</div><div class="corr-content"><div class="corr-item">Exec Summary — annual cost savings</div><div class="corr-was">Was: SGD 3.96M/yr</div><div class="corr-now">Now: SGD 3.99M/yr (2.48 + 0.43 + 1.08)</div><div class="corr-note">Minor rounding — table was correct</div></div></div>
+          <div class="corr-row"><div class="corr-num">3</div><div class="corr-content"><div class="corr-item">Section 2.1 — solar generation</div><div class="corr-was">Was: 7 GWh stated</div><div class="corr-now">Now: 11 GWh (3.9% of 283 GWh = 11 GWh)</div><div class="corr-note">Transcription error — Exec Summary was correct</div></div></div>
+          <div class="corr-row"><div class="corr-num">4</div><div class="corr-content"><div class="corr-item">Table — Scope 3 payback period</div><div class="corr-was">Was: 3.5 years</div><div class="corr-now">Now: 5.4 years (SGD 1.5M ÷ SGD 0.28M net)</div><div class="corr-note">Gross savings used instead of net</div></div></div>
+          <div class="corr-row"><div class="corr-num">5</div><div class="corr-content"><div class="corr-item">Table — Scope 3 cost per tCO₂e</div><div class="corr-was">Was: SGD 276</div><div class="corr-now">Now: SGD 300 (SGD 1.5M ÷ 5,000 tCO₂e)</div><div class="corr-note">Inconsistent formula vs DCAP and AI entries</div></div></div>
+          <div class="corr-row" style="border-bottom:none"><div class="corr-num">6</div><div class="corr-content"><div class="corr-item">Table — ROI formula definition</div><div class="corr-was">Was: "Annual Net Benefit / CapEx × 100"</div><div class="corr-now">Now: Annual Savings / CapEx × 100 (consistent)</div><div class="corr-note">Definition corrected to match calculation</div></div></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Verified calculations</div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">276 GWh × 3% × 0.412 = 3,411 tCO₂e (DCAP)</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">276 GWh × 3% × SGD 0.30 = SGD 2.48M (DCAP)</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">3.6 GWh × 0.412 = 1,483 tCO₂e (Smart-Cool)</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">3.6 GWh × SGD 0.30 = SGD 1.08M (Smart-Cool)</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">276 × 55% × 55% = 83.5 GWh ACMV in scope</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">SGD 1.0M ÷ SGD 2.38M net = 0.42 yr payback (DCAP)</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">SGD 2.5M ÷ SGD 0.78M net = 3.2 yr payback (AI)</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">3,411 + 5,000 + 1,483 = 9,894 tCO₂e total</div></div>
+          <div class="verified-row"><div class="vcheck"><svg viewBox="0 0 24 24" fill="none" stroke="#1A5C3A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="vtext">2.48 + 0.43 + 1.08 = SGD 3.99M annual savings</div></div>
+          <div style="margin-top:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px">
+            <div style="font-size:11px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Key assumptions</div>
+            <div style="font-size:11px;color:var(--color-text-secondary);line-height:1.7">EMA grid EF: 0.412 kgCO₂/kWh (FY2024) · Electricity tariff: SGD 0.30/kWh · Shadow carbon: SGD 100/tCO₂e · No discount rate · 10-year horizon · All CapEx/OpEx as stated per section</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;margin-bottom:0">
+        <div class="card-title">Financial summary — corrected values</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;font-size:12px;border-collapse:collapse;table-layout:fixed" aria-label="Corrected financial summary table for three enhancements">
+            <thead><tr style="background:var(--color-background-secondary)">
+              <th style="padding:8px;text-align:left;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);width:22%">Enhancement</th>
+              <th style="padding:8px;text-align:center;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)">CapEx</th>
+              <th style="padding:8px;text-align:center;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)">Savings/yr</th>
+              <th style="padding:8px;text-align:center;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)">CO₂/yr</th>
+              <th style="padding:8px;text-align:center;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)">NPV 10yr</th>
+              <th style="padding:8px;text-align:center;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)">Payback</th>
+              <th style="padding:8px;text-align:center;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)">ROI</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="padding:8px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;color:var(--color-text-primary)">DCAP</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 1.0M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 2.48M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary);color:#1A5C3A;font-weight:500">3,411</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 22.8M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary);color:#1A5C3A;font-weight:500">0.42 yrs</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">248%</td></tr>
+              <tr style="background:var(--color-background-secondary)"><td style="padding:8px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;color:var(--color-text-primary)">Scope 3</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 1.5M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 0.43M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary);color:#0D7377;font-weight:500">5,000</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 1.3M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">5.4 yrs ✓</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">29%</td></tr>
+              <tr><td style="padding:8px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;color:var(--color-text-primary)">Smart-Cool</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 2.5M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 1.08M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500">1,483</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">SGD 5.3M</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">3.2 yrs</td><td style="padding:8px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">43%</td></tr>
+              <tr style="background:#0D2B1E"><td style="padding:8px;font-weight:500;color:#fff">Total</td><td style="padding:8px;text-align:center;color:#A8D5B5;font-weight:500">SGD 5.0M</td><td style="padding:8px;text-align:center;color:#A8D5B5;font-weight:500">SGD 3.99M</td><td style="padding:8px;text-align:center;color:#F4A300;font-weight:500">9,894</td><td style="padding:8px;text-align:center;color:#A8D5B5;font-weight:500">SGD 29.4M</td><td style="padding:8px;text-align:center;color:#A8D5B5">—</td><td style="padding:8px;text-align:center;color:#A8D5B5">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:8px;font-style:italic">✓ = corrected value · ROI = Annual Savings / CapEx × 100 (gross basis, consistent) · Cost/tCO₂e = CapEx ÷ Annual Abatement</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function switchTab(id,el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  el.setAttribute('aria-current','page');
+  if(id==='overview'&&!window._c_scope)buildOverview();
+  if(id==='enhancement'&&!window._c_enh)buildEnh();
+  if(id==='simulator'&&!window._c_sim){buildSim();updateSim();}
+  if(id==='roadmap'&&!window._c_invest)buildRoadmap();
+}
+function buildOverview(){
+  window._c_scope=new Chart(document.getElementById('c_scope'),{type:'doughnut',data:{labels:['Scope 1','Scope 2','Scope 3'],datasets:[{data:[2.7,115,211],backgroundColor:['#0D2B1E','#1A5C3A','#F4A300'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}});
+  window._c_s3=new Chart(document.getElementById('c_s3'),{type:'bar',data:{labels:['Capital\nGoods','Purchased\nGoods','Business\nTravel','Employee\nCommute','Other'],datasets:[{data:[63.2,39.3,34,18,56.5],backgroundColor:['#0D2B1E','#1A5C3A','#2E8B57','#A8D5B5','#D3D1C7'],borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'ktCO₂e',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#888780'}},x:{grid:{display:false},ticks:{color:'#888780',font:{size:10},autoSkip:false}}}}});
+}
+function buildEnh(){
+  window._c_enh=new Chart(document.getElementById('c_enh'),{type:'bar',data:{labels:['DCAP','Scope 3','Smart-Cool'],datasets:[{label:'CO₂ abated (tCO₂e/yr)',data:[3411,5000,1483],backgroundColor:['#1A5C3A','#0D7377','#0D2B1E'],borderRadius:3,borderSkipped:false,yAxisID:'y1'},{label:'10-yr NPV (SGD M)',data:[22.8,1.3,5.3],backgroundColor:['rgba(26,92,58,0.3)','rgba(13,115,119,0.3)','rgba(13,43,30,0.3)'],borderRadius:3,borderSkipped:false,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y1:{position:'left',title:{display:true,text:'tCO₂e/yr',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#888780'}},y2:{position:'right',title:{display:true,text:'SGD M NPV',font:{size:10}},grid:{display:false},ticks:{color:'#888780'}},x:{grid:{display:false},ticks:{color:'#888780'}}}}});
+}
+let simChart=null;
+function buildSim(){
+  simChart=new Chart(document.getElementById('c_sim'),{type:'bar',data:{labels:['DCAP','Scope 3','Smart-Cool'],datasets:[{data:[3411,5000,1483],backgroundColor:['#1A5C3A','#0D7377','#0D2B1E'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'tCO₂e/yr',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#888780'}},x:{grid:{display:false},ticks:{color:'#888780'}}}}});
+  const yrs=['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10'];
+  const dcapCum=[0,1.38,3.66,5.94,8.22,10.5,12.78,15.06,17.34,19.62,21.9];
+  const scCum=[-2.5,-1.72,-0.94,-0.16,0.62,1.4,2.18,2.96,3.74,4.52,5.3];
+  const s3Cum=[-1.5,-1.22,-0.94,-0.16,0.62,1.4,2.18,2.96,3.74,4.52,1.3];
+  window._c_cum=new Chart(document.getElementById('c_cum'),{type:'line',data:{labels:yrs,datasets:[{label:'DCAP',data:dcapCum,borderColor:'#1A5C3A',backgroundColor:'transparent',tension:.3,pointRadius:3,borderWidth:2},{label:'Smart-Cool',data:scCum,borderColor:'#0D7377',backgroundColor:'transparent',tension:.3,pointRadius:3,borderDash:[4,3],borderWidth:2},{label:'Scope 3',data:s3Cum,borderColor:'#F4A300',backgroundColor:'transparent',tension:.3,pointRadius:3,borderDash:[2,2],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#888780',callback:v=>v+'M'}},x:{grid:{display:false},ticks:{color:'#888780',font:{size:10}}}}}});
+  window._c_sim=true;
+}
+function buildRoadmap(){
+  const yrs=['Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10'];
+  window._c_invest=new Chart(document.getElementById('c_invest'),{type:'line',data:{labels:yrs,datasets:[{label:'Cumulative investment',data:[5,5,5,5,5,5,5,5,5,5],borderColor:'#C0392B',backgroundColor:'transparent',tension:0,pointRadius:3,borderDash:[4,3],borderWidth:2},{label:'Cumulative savings',data:[2.4,5.6,9.6,13.6,17.6,21.6,25.6,29.6,31.9,34.4],borderColor:'#1A5C3A',backgroundColor:'transparent',tension:.3,pointRadius:3,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#888780',callback:v=>v+'M'}},x:{grid:{display:false},ticks:{color:'#888780'}}}}});
+}
+function updateSim(){
+  const ef=0.412,grid=276,tariff=parseInt(document.getElementById('sl3').value)/100;
+  const dcapPct=parseInt(document.getElementById('sl1').value)/100;
+  const aiPct=parseInt(document.getElementById('sl2').value)/100;
+  const s3Pct=parseInt(document.getElementById('sl4').value)/100;
+  const scp=parseInt(document.getElementById('sl5').value);
+  document.getElementById('sv1').textContent=Math.round(dcapPct*100)+'%';
+  document.getElementById('sv2').textContent=Math.round(aiPct*100)+'%';
+  document.getElementById('sv3').textContent=tariff.toFixed(2);
+  document.getElementById('sv4').textContent=Math.round(s3Pct*100)+'%';
+  document.getElementById('sv5').textContent=scp;
+  const dcapCo2=Math.round(grid*dcapPct*1000*ef);
+  const dcapSav=parseFloat((grid*dcapPct*1000*tariff/1e6).toFixed(2));
+  const aiGwh=Math.min(3.6*(aiPct/0.15),12.5);
+  const aiCo2=Math.round(aiGwh*1000*ef);
+  const aiSav=parseFloat((aiGwh*1000*tariff/1e6).toFixed(2));
+  const s3Co2=Math.round(102000*s3Pct*0.5);
+  const totalCo2=dcapCo2+s3Co2+aiCo2;
+  const totalSav=parseFloat((dcapSav+aiSav+0.43).toFixed(2));
+  const npv=parseFloat(((totalSav-0.55)*10-5).toFixed(1));
+  const shadowTotal=parseFloat(((dcapCo2+aiCo2+s3Co2)*scp/1e6).toFixed(2));
+  document.getElementById('res1').textContent=totalCo2.toLocaleString();
+  document.getElementById('res2').textContent='SGD '+totalSav+'M';
+  document.getElementById('res3').textContent='SGD '+npv+'M';
+  document.getElementById('shadow-val').textContent=shadowTotal.toFixed(2);
+  const s1s2_red=(dcapCo2+aiCo2)/1000;
+  const after=parseFloat((118-s1s2_red).toFixed(1));
+  document.getElementById('prog-after-val').textContent='~'+after;
+  document.getElementById('prog-bar').style.width=Math.round((after/118)*100)+'%';
+  const gapPct=Math.round((s1s2_red/39)*100);
+  document.getElementById('prog-note').textContent='Proposals address '+gapPct+'% of the 39 ktCO₂e S1+2 gap. Additional NUS measures needed to reach 79 ktCO₂e target.';
+  if(simChart){simChart.data.datasets[0].data=[dcapCo2,s3Co2,aiCo2];simChart.update();}
+}
+buildOverview();
+buildEnh();
+document.querySelectorAll('.sb-item').forEach(item=>{
+  item.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')item.click();});
+});
+</script>
